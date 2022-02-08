@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Share_Schedule</string>
+
+    <string name="loginButton">시작하기</string>
+    <string name="login_guide">구글 캘린더 사용을 위해 구글 로그인이 필요합니다.</string>
+    <string name="signIn_fail">인증 실패.</string>
+    <string name="autoLogin">autoLogin</string>
 </resources>
