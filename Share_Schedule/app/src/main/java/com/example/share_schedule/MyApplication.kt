@@ -17,7 +17,7 @@ class MyApplication: Application() {
 //        lateinit var viewModelFactory: ViewModelFactory
 //        lateinit var dataBase: CalendarDatabase
         lateinit var preferenceManager: PreferenceManager
-        lateinit var fa: FirebaseAuth
+        lateinit var firebaseAuth: FirebaseAuth
         lateinit var gso: GoogleSignInOptions
         lateinit var gsc: GoogleSignInClient
 
@@ -45,7 +45,7 @@ class MyApplication: Application() {
         preferenceManager = PreferenceManager(this)
 //        viewModelFactory = ViewModelFactory(pm, CalendarRepositoryImpl())
 
-        fa = Firebase.auth
+        firebaseAuth = Firebase.auth
         gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()

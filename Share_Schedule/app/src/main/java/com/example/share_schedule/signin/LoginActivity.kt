@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.example.jh_calendar.signin.ProfileState
 import com.example.share_schedule.MyApplication
+import com.example.share_schedule.MyApplication.Companion.firebaseAuth
 import com.example.share_schedule.R
 import com.example.share_schedule.calendar.CalendarActivity
 import com.example.share_schedule.data.remote.GoogleCalendarApiProvider
@@ -33,10 +34,6 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels()
     lateinit var binding: ActivityLoginBinding
     private fun getViewBinding(): ActivityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
-
-    private val firebaseAuth by lazy {
-        FirebaseAuth.getInstance()
-    }
 
     private val loginLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
