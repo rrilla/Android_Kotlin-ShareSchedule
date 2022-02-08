@@ -27,7 +27,7 @@ class LoginViewModel: ViewModel() {
         }
     }
 
-    private fun setState(state: ProfileState) {
+    fun setState(state: ProfileState) {
         _profileStateLiveData.postValue(state)
     }
 

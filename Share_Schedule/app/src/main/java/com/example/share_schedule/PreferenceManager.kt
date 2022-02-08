@@ -11,6 +11,8 @@ class PreferenceManager(
         const val PREFERENCES_NAME = "shareSchedule"
 
         const val KEY_ID_TOKEN = "ID_TOKEN"
+        const val KEY_CALENDAR_NEXTSYNC_TOKEN = "CALENDAR_NEXTSYNC_TOKEN"
+        const val KEY_EVENT_NEXTSYNC_TOKEN = "EVENT_NEXTSYNC_TOKEN"
     }
 
     private fun getPreferences(context: Context): SharedPreferences {
@@ -40,4 +42,31 @@ class PreferenceManager(
         editor.apply()
     }
 
+    fun putCalendarNextSyncToken(syncToken: String) {
+        editor.putString(KEY_CALENDAR_NEXTSYNC_TOKEN, syncToken)
+        editor.apply()
+    }
+
+    fun getCalendarNextSyncToken(): String? {
+        return prefs.getString(KEY_CALENDAR_NEXTSYNC_TOKEN, null)
+    }
+
+    fun removeCalendarNextSyncToken() {
+        editor.putString(KEY_CALENDAR_NEXTSYNC_TOKEN, null)
+        editor.apply()
+    }
+
+    fun putEventNextSyncToken(syncToken: String) {
+        editor.putString(KEY_EVENT_NEXTSYNC_TOKEN, syncToken)
+        editor.apply()
+    }
+
+    fun getEventNextSyncToken(): String? {
+        return prefs.getString(KEY_EVENT_NEXTSYNC_TOKEN, null)
+    }
+
+    fun removeEventNextSyncToken() {
+        editor.putString(KEY_EVENT_NEXTSYNC_TOKEN, null)
+        editor.apply()
+    }
 }
