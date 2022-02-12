@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Share_Schedule">
         <activity
+            android:name=".insertCalendar.InsertCalendar"
+            android:exported="false" />
+        <activity
             android:name=".calendar.CalendarActivity"
             android:exported="false" />
         <activity

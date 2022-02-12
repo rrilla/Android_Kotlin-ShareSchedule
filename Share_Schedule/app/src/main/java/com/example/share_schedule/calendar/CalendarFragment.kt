@@ -31,7 +31,7 @@ class CalendarFragment : Fragment() {
     private val sharedViewModel: ShareViewModel by activityViewModels()
     private val viewModel: CalendarViewModel by viewModels()
 
-    private var _binding: FragmentCalendarBinding?= null
+    private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var monthFragmentStateAdapter : MonthFragmentStateAdapter

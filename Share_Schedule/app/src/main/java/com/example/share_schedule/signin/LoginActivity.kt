@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.example.jh_calendar.signin.ProfileState
 import com.example.share_schedule.MyApplication
 import com.example.share_schedule.MyApplication.Companion.firebaseAuth
 import com.example.share_schedule.R
@@ -16,15 +15,12 @@ import com.example.share_schedule.calendar.CalendarActivity
 import com.example.share_schedule.data.remote.GoogleCalendarApiProvider
 import com.example.share_schedule.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.calendar.CalendarScopes
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import java.lang.Exception

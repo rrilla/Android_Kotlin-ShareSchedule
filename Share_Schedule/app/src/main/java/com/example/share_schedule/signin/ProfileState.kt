@@ -1,4 +1,4 @@
-package com.example.jh_calendar.signin
+package com.example.share_schedule.signin
 
 import android.net.Uri
 import com.google.api.services.calendar.model.CalendarListEntry
