@@ -6,7 +6,11 @@ import androidx.lifecycle.ViewModel
 
 class ShareViewModel: ViewModel() {
 
-    private var _selectLocationLiveData = MutableLiveData<Map<String,String>>()
+    private var _selectLocationLiveData = MutableLiveData<Map<String, String>>()
     val selectLocationLiveData: LiveData<Map<String, String>> = _selectLocationLiveData
+
+    fun setSelectLocation(place: Map<String, String>) {
+        _selectLocationLiveData.postValue(place)
+    }
 
 }

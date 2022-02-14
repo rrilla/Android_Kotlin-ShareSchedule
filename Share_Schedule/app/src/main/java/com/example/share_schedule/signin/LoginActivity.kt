@@ -12,6 +12,7 @@ import com.example.share_schedule.MyApplication
 import com.example.share_schedule.MyApplication.Companion.firebaseAuth
 import com.example.share_schedule.R
 import com.example.share_schedule.calendar.CalendarActivity
+import com.example.share_schedule.data.CalendarRepository
 import com.example.share_schedule.data.remote.GoogleCalendarApiProvider
 import com.example.share_schedule.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn

@@ -1,4 +1,4 @@
-package com.example.testmapapi.util
+package com.example.share_schedule.insertCalendar.util
 
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
