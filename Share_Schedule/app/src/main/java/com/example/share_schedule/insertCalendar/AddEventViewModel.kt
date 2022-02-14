@@ -1,23 +1,22 @@
 package com.example.share_schedule.insertCalendar
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.share_schedule.data.CalendarRepository
 import com.example.share_schedule.data.db.entity.CalendarEntity
-import com.example.share_schedule.data.remote.model.event.Event
 import com.example.share_schedule.data.remote.model.event.InsertEventEntity
-import com.example.share_schedule.insertCalendar.adapter.InsertReminderData
 import com.google.api.client.util.DateTime
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 
 class AddEventViewModel: ViewModel() {
 
     private val calendarRepository = CalendarRepository()
+
+    private var _insertStateLiveData = MutableLiveData<InsertState>()
+    val insertStateLiveData: LiveData<InsertState> = _insertStateLiveData
 
     private var _calendarListLiveData = MutableLiveData<List<CalendarEntity>>()
     val calendarListLiveData: LiveData<List<CalendarEntity>> = _calendarListLiveData
@@ -31,13 +30,17 @@ class AddEventViewModel: ViewModel() {
     private var _endDateTimeLiveData = MutableLiveData<Calendar>()
     val endDateTimeLiveData: LiveData<Calendar> = _endDateTimeLiveData
 
+    private fun setCalendarList(list: List<CalendarEntity>) {
+        _calendarListLiveData.postValue(list)
+    }
+
+    private fun setInsertState(insertState: InsertState) {
+        _insertStateLiveData.postValue(insertState)
+    }
+
     fun getCalendarList() = viewModelScope.launch{
         val calendarList = calendarRepository.getLocalCalendarList()
         setCalendarList(calendarList)
-    }
-
-    private fun setCalendarList(list: List<CalendarEntity>) {
-        _calendarListLiveData.postValue(list)
     }
 
     fun setSelectCalendar(position: Int) {
@@ -59,9 +62,13 @@ class AddEventViewModel: ViewModel() {
             this.calendarId = selectCalendarLiveData.value?.id
             this.startDateTime = DateTime(startDateTime)
             this.endDateTime = DateTime(endDateTime)
-            this.location = "테스트위치"
         }
-        calendarRepository.insertEvent(event)
-    }
 
+        setInsertState(InsertState.Loading)
+        if(calendarRepository.insertEvent(event)){
+            setInsertState(InsertState.Success)
+        }else{
+            setInsertState(InsertState.Error)
+        }
+    }
 }

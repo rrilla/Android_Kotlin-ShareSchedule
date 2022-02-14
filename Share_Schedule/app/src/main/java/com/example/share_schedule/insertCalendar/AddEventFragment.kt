@@ -20,6 +20,7 @@ import com.example.share_schedule.databinding.FragmentAddEventBinding
 import com.example.share_schedule.insertCalendar.adapter.ReminderAdapter
 import com.example.share_schedule.insertCalendar.adapter.UserAdapter
 import com.example.share_schedule.insertCalendar.util.InsertCalendarDialog
+import com.example.share_schedule.signin.ProfileState
 import java.util.*
 
 class AddEventFragment : Fragment() {
@@ -103,9 +104,6 @@ class AddEventFragment : Fragment() {
         binding.saveButton.setOnClickListener {
             val summary = binding.addSummary.text.toString()
             val description = binding.addDescription.text.toString()
-//            viewModel.setUser(userAdapter.data)
-//            viewModel.setReminder(reminderAdapter.data)
-//            shareViewModel.selectLocationLiveData
             val event = InsertEventEntity().apply {
                 this.summary = summary
                 this.description = description
@@ -210,6 +208,13 @@ class AddEventFragment : Fragment() {
             binding.endDate.text = "${it.get(Calendar.YEAR)}년 ${it.get(Calendar.MONTH)+1}월 ${it.get(Calendar.DATE)}일"
             binding.endTime.text = "${it.get(Calendar.HOUR_OF_DAY)} 시 ${it.get(Calendar.MINUTE)}분"
         }
+        viewModel.insertStateLiveData.observe(this){
+            when (it) {
+                is InsertState.Loading -> handleLoadingState()
+                is InsertState.Success -> handleSuccessState()
+                is InsertState.Error -> handleErrorState()
+            }
+        }
 
         shareViewModel.selectLocationLiveData.observe(this){
             if(it["title"] == null || it["address"] == null){
@@ -219,4 +224,12 @@ class AddEventFragment : Fragment() {
             }
         }
     }
+
+    private fun handleLoadingState() { }
+
+    private fun handleSuccessState() {
+        
+    }
+
+    private fun handleErrorState() { }
 }
