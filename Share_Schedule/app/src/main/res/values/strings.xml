@@ -7,6 +7,8 @@
     <string name="signIn_fail_google">Google 인증 실패.</string>
     <string name="autoLogin">autoLogin</string>
     <string name="error">오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

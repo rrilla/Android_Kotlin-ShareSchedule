@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.share_schedule.R
 import com.example.share_schedule.databinding.ActivityCalendarBinding
-import com.example.share_schedule.insertCalendar.InsertCalendar
+import com.example.share_schedule.insertCalendar.InsertActivity
 
 class CalendarActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCalendarBinding
@@ -23,7 +23,7 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun initViews(): Unit = with(binding) {
         binding.insertCalendarButton.setOnClickListener {
-            intent = Intent(this@CalendarActivity, InsertCalendar::class.java)
+            intent = Intent(this@CalendarActivity, InsertActivity::class.java)
             startActivity(intent)
         }
         setTransaction()
