@@ -1,11 +1,7 @@
 package com.example.share_schedule
 
 import android.app.Application
-import android.content.SharedPreferences
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.example.share_schedule.data.CalendarDataSource
-import com.example.share_schedule.data.CalendarRepository
 import com.example.share_schedule.data.db.CalendarDatabase
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
