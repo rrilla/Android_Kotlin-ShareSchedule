@@ -41,7 +41,7 @@ class InsertActivity : AppCompatActivity() {
             setReorderingAllowed(true)
             // BackStack에 이전Fragment 저장
             addToBackStack(null)
-            add(binding.fragmentContainerView.id, fragment)
+            replace(binding.fragmentContainerView.id, fragment)
         }
     }
 }

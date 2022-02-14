@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.share_schedule.data.CalendarRepository
 import com.example.share_schedule.data.db.entity.CalendarEntity
+import com.example.share_schedule.data.remote.model.event.Event
+import com.example.share_schedule.data.remote.model.event.InsertEventEntity
 import com.example.share_schedule.insertCalendar.adapter.InsertReminderData
+import com.google.api.client.util.DateTime
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,35 +22,14 @@ class AddEventViewModel: ViewModel() {
     private var _calendarListLiveData = MutableLiveData<List<CalendarEntity>>()
     val calendarListLiveData: LiveData<List<CalendarEntity>> = _calendarListLiveData
 
-    private var _summaryLiveData = MutableLiveData<String>()
-    val summaryLiveData: LiveData<String> = _summaryLiveData
-
     private var _selectCalendarLiveData = MutableLiveData<CalendarEntity>()
     val selectCalendarLiveData: LiveData<CalendarEntity> = _selectCalendarLiveData
 
-    private var _startDateLiveData = MutableLiveData<Calendar>()
-    val startDateLiveData: LiveData<Calendar> = _startDateLiveData
+    private var _startDateTimeLiveData = MutableLiveData<Calendar>()
+    val startDateTimeLiveData: LiveData<Calendar> = _startDateTimeLiveData
 
-    private var _startTimeLiveData = MutableLiveData<Calendar>()
-    val startTimeLiveData: LiveData<Calendar> = _startTimeLiveData
-
-    private var _endDateLiveData = MutableLiveData<Calendar>()
-    val endDateLiveData: LiveData<Calendar> = _endDateLiveData
-
-    private var _endTimeLiveData = MutableLiveData<Calendar>()
-    val endTimeLiveData: LiveData<Calendar> = _endTimeLiveData
-
-    private var _locationLiveData = MutableLiveData<String>()
-    val locationLiveData: LiveData<String> = _locationLiveData
-
-    private var _userLiveData = MutableLiveData<List<String>>()
-    val userLiveData: LiveData<List<String>> = _userLiveData
-
-    private var _reminderLiveData = MutableLiveData<List<InsertReminderData>>()
-    val reminderLiveData: LiveData<List<InsertReminderData>> = _reminderLiveData
-
-    private var _descriptionLiveData = MutableLiveData<String>()
-    val descriptionLiveData: LiveData<String> = _descriptionLiveData
+    private var _endDateTimeLiveData = MutableLiveData<Calendar>()
+    val endDateTimeLiveData: LiveData<Calendar> = _endDateTimeLiveData
 
     fun getCalendarList() = viewModelScope.launch{
         val calendarList = calendarRepository.getLocalCalendarList()
@@ -61,9 +43,6 @@ class AddEventViewModel: ViewModel() {
     }
 
     private fun setCalendarList(list: List<CalendarEntity>) {
-        for(calendar in list){
-            Log.e("setCalendarList", "${calendar.id}${calendar.summary}")
-        }
         _calendarListLiveData.postValue(list)
     }
 
@@ -72,30 +51,28 @@ class AddEventViewModel: ViewModel() {
         _selectCalendarLiveData.postValue(selectCalendar!!)
     }
 
-    fun setStartDate(cal: Calendar) {
-        formatDate(cal.time)
+    fun setStartDateTime(cal: Calendar) {
         Log.e("setStartDate", formatDate(cal.time))
-        _startDateLiveData.postValue(cal)
+        _startDateTimeLiveData.postValue(cal)
     }
-    fun setEndDate(cal: Calendar) {
+    fun setEndDateTime(cal: Calendar) {
         Log.e("setEndDate", "time - ${cal.time}")
-        _endDateLiveData.postValue(cal)
+        _endDateTimeLiveData.postValue(cal)
     }
-    fun setStartTime(cal: Calendar) {
-        Log.e("setStartTime", "time - ${cal.time}")
-        _startTimeLiveData.postValue(cal)
+
+    fun insertEvent(event: InsertEventEntity) = viewModelScope.launch {
+        val startDateTime = startDateTimeLiveData.value?.let { formatDate(it.time) }
+        val endDateTime = endDateTimeLiveData.value?.let { formatDate(it.time) }
+        event.apply {
+            this.calendarId = selectCalendarLiveData.value?.id
+            this.startDateTime = DateTime(startDateTime)
+            this.endDateTime = DateTime(endDateTime)
+            this.location = "테스트위치"
+        }
+        calendarRepository.insertEvent(event)
     }
-    fun setEndTime(cal: Calendar) {
-        Log.e("setEndTime", "time - ${cal.time}")
-        _endTimeLiveData.postValue(cal)
-    }
-    fun setLocation(location: String) {
-        _locationLiveData.postValue(location)
-    }
-    fun setUser(userList: List<String>) {
-        _userLiveData.postValue(userList)
-    }
-    fun setReminder(reminderList: List<InsertReminderData>) {
-        _reminderLiveData.postValue(reminderList)
-    }
+
+//    private fun getStartDateTime() {
+//        startDateLiveData.value.set(Calendar.HOUR_OF_DAY)
+//    }
 }

@@ -13,6 +13,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.share_schedule.R
+import com.example.share_schedule.data.remote.model.event.Event
+import com.example.share_schedule.data.remote.model.event.InsertEventEntity
 import com.example.share_schedule.databinding.FragmentAddEventBinding
 import com.example.share_schedule.insertCalendar.adapter.ReminderAdapter
 import com.example.share_schedule.insertCalendar.adapter.UserAdapter
@@ -44,6 +46,8 @@ class AddEventFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.getCalendarList()
+        viewModel.setStartDateTime(Calendar.getInstance())
+        viewModel.setEndDateTime(Calendar.getInstance().apply { set(Calendar.DATE, this.get(Calendar.DATE)+1) })
         initViews()
         observeData()
     }
@@ -98,9 +102,17 @@ class AddEventFragment : Fragment() {
         binding.saveButton.setOnClickListener {
             val summary = binding.addSummary.text.toString()
             val description = binding.addDescription.text.toString()
-            viewModel.setUser(userAdapter.data)
-            viewModel.setReminder(reminderAdapter.data)
-            shareViewModel.selectLocationLiveData
+//            viewModel.setUser(userAdapter.data)
+//            viewModel.setReminder(reminderAdapter.data)
+//            shareViewModel.selectLocationLiveData
+            val event = InsertEventEntity().apply {
+                this.summary = summary
+                this.description = description
+                this.location = shareViewModel.selectLocationLiveData.value?.get("address")
+                this.attendees = userAdapter.data
+                this.reminders = reminderAdapter.data
+            }
+            viewModel.insertEvent(event)
         }
     }
 
@@ -118,7 +130,7 @@ class AddEventFragment : Fragment() {
         if(type == "start"){
             val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 cal.set(year, month, dayOfMonth)
-                viewModel.setStartDate(cal)
+                viewModel.setStartDateTime(cal)
             }
             DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(
                 Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
@@ -126,7 +138,7 @@ class AddEventFragment : Fragment() {
         } else{
             val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 cal.set(year, month, dayOfMonth)
-                viewModel.setEndDate(cal)
+                viewModel.setEndDateTime(cal)
             }
             DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(
                 Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
@@ -139,9 +151,9 @@ class AddEventFragment : Fragment() {
         if(type == "start"){
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 binding.startTime.text = "${hour} 시 ${minute}분"
-                cal.set(Calendar.HOUR, hour)
+                cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
-                viewModel.setStartTime(cal)
+                viewModel.setStartDateTime(cal)
             }
             TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR),
                 cal.get(Calendar.MINUTE), true)
@@ -149,9 +161,9 @@ class AddEventFragment : Fragment() {
         } else{
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 binding.endTime.text = "${hour} 시 ${minute}분"
-                cal.set(Calendar.HOUR, hour)
+                cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
-                viewModel.setEndTime(cal)
+                viewModel.setEndDateTime(cal)
             }
             TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR),
                 cal.get(Calendar.MINUTE), true)
@@ -161,7 +173,7 @@ class AddEventFragment : Fragment() {
 
     private fun observeData() {
         viewModel.calendarListLiveData.observe(this){
-            binding.addCalendarTextView.text = it[0].summary
+            viewModel.setSelectCalendar(0)
             //  ListAdapter로 캘린더 목록에 따라 동적 바인딩
             val listArr = arrayListOf<String>()
             for (item in it){
@@ -181,16 +193,12 @@ class AddEventFragment : Fragment() {
         viewModel.selectCalendarLiveData.observe(this){
             binding.addCalendarTextView.text = it.summary
         }
-        viewModel.startDateLiveData.observe(this){
+        viewModel.startDateTimeLiveData.observe(this){
             binding.startDate.text = "${it.get(Calendar.YEAR)}년 ${it.get(Calendar.MONTH)+1}월 ${it.get(Calendar.DATE)}일"
-        }
-        viewModel.endDateLiveData.observe(this){
-            binding.endDate.text = "${it.get(Calendar.YEAR)}년 ${it.get(Calendar.MONTH)+1}월 ${it.get(Calendar.DATE)}일"
-        }
-        viewModel.startTimeLiveData.observe(this){
             binding.startTime.text = "${it.get(Calendar.HOUR_OF_DAY)} 시 ${it.get(Calendar.MINUTE)}분"
         }
-        viewModel.endTimeLiveData.observe(this){
+        viewModel.endDateTimeLiveData.observe(this){
+            binding.endDate.text = "${it.get(Calendar.YEAR)}년 ${it.get(Calendar.MONTH)+1}월 ${it.get(Calendar.DATE)}일"
             binding.endTime.text = "${it.get(Calendar.HOUR_OF_DAY)} 시 ${it.get(Calendar.MINUTE)}분"
         }
 
@@ -199,7 +207,6 @@ class AddEventFragment : Fragment() {
                 binding.addLocation.text = getString(R.string.error_location)
             } else{
                 binding.addLocation.text = it["title"]
-                viewModel.setLocation(it["address"]!!)
             }
         }
     }

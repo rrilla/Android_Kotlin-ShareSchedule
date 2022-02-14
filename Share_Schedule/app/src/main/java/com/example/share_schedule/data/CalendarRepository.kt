@@ -7,11 +7,9 @@ import com.example.share_schedule.data.db.entity.CalendarEntity
 import com.example.share_schedule.data.db.entity.EventEntity
 import com.example.share_schedule.data.remote.GoogleCalendarApiProvider
 import com.example.share_schedule.data.remote.model.calendar.Calendar
-import com.example.share_schedule.data.remote.model.event.Event
+import com.example.share_schedule.data.remote.model.event.InsertEventEntity
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.services.calendar.model.CalendarList
-import com.google.api.services.calendar.model.Events
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,6 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.HashMap
+
+import com.google.api.client.util.DateTime
+import com.google.api.services.calendar.model.*
+import java.lang.Exception
+
 
 class CalendarRepository: CalendarDataSource {
 
@@ -99,7 +102,7 @@ class CalendarRepository: CalendarDataSource {
 
                 val items = events.items
                 for (event in items) {
-                    val data = Gson().fromJson(event.toString(), Event::class.java)
+                    val data = Gson().fromJson(event.toString(), com.example.share_schedule.data.remote.model.event.Event::class.java)
                     data.calendarId = calendarId
                     saveCalendarEventList.add(data.toEntity())
                 }
@@ -112,6 +115,53 @@ class CalendarRepository: CalendarDataSource {
                 preferenceManager.putEventNextSyncToken(Gson().toJson(syncTokenMap))
             }
             return@withContext saveCalendarEventList
+        }
+
+    override suspend fun insertEvent(insertEvent: InsertEventEntity) =
+        withContext(ioDispatchers) {
+            var event: Event = Event()
+                .setSummary(insertEvent.summary)
+                .setLocation(insertEvent.location)
+                .setDescription(insertEvent.description)
+
+            val start = EventDateTime()
+                .setDateTime(insertEvent.startDateTime)
+            event.start = start
+
+            val end = EventDateTime()
+                .setDateTime(insertEvent.endDateTime)
+            event.end = end
+
+            insertEvent.attendees?.let {
+                val attendees = mutableListOf<EventAttendee>()
+                for (item in it){
+                    attendees.add(EventAttendee().setEmail(item))
+                }
+                event.setAttendees(attendees)
+            }
+
+            insertEvent.reminders?.let {
+                val reminderOverrides = mutableListOf<EventReminder>()
+                for (item in it){
+                    EventReminder().setMethod(item.reminderType).minutes = item.getTimeOfNumber()
+                }
+                val reminders: Event.Reminders = Event.Reminders()
+                    .setUseDefault(false)
+                    .setOverrides(reminderOverrides)
+                event.reminders = reminders
+            }
+
+            try{
+                event = service.events().insert(insertEvent.calendarId, event).execute()
+                Log.e("insertEvent", """
+                    status = ${event.status}
+                    htmlLink = ${event.htmlLink}
+                """.trimIndent())
+                return@withContext true
+            } catch(e: Exception) {
+                e.printStackTrace()
+                return@withContext false
+            }
         }
 
     override suspend fun insertLocalCalendarList(calendarList: List<CalendarEntity>) =
