@@ -4,17 +4,26 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.share_schedule.insertCalendar.adapter.InsertCalendarData
+import androidx.lifecycle.viewModelScope
+import com.example.share_schedule.data.CalendarRepository
+import com.example.share_schedule.data.db.entity.CalendarEntity
+import com.example.share_schedule.insertCalendar.adapter.InsertReminderData
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddEventViewModel: ViewModel() {
 
+    private val calendarRepository = CalendarRepository()
+
+    private var _calendarListLiveData = MutableLiveData<List<CalendarEntity>>()
+    val calendarListLiveData: LiveData<List<CalendarEntity>> = _calendarListLiveData
+
     private var _summaryLiveData = MutableLiveData<String>()
     val summaryLiveData: LiveData<String> = _summaryLiveData
 
-    private var _calendarLiveData = MutableLiveData<Calendar>()
-    val calendarLiveData: LiveData<Calendar> = _calendarLiveData
+    private var _selectCalendarLiveData = MutableLiveData<CalendarEntity>()
+    val selectCalendarLiveData: LiveData<CalendarEntity> = _selectCalendarLiveData
 
     private var _startDateLiveData = MutableLiveData<Calendar>()
     val startDateLiveData: LiveData<Calendar> = _startDateLiveData
@@ -34,16 +43,33 @@ class AddEventViewModel: ViewModel() {
     private var _userLiveData = MutableLiveData<List<String>>()
     val userLiveData: LiveData<List<String>> = _userLiveData
 
-    private var _reminderLiveData = MutableLiveData<List<InsertCalendarData>>()
-    val reminderLiveData: LiveData<List<InsertCalendarData>> = _reminderLiveData
+    private var _reminderLiveData = MutableLiveData<List<InsertReminderData>>()
+    val reminderLiveData: LiveData<List<InsertReminderData>> = _reminderLiveData
 
     private var _descriptionLiveData = MutableLiveData<String>()
     val descriptionLiveData: LiveData<String> = _descriptionLiveData
+
+    fun getCalendarList() = viewModelScope.launch{
+        val calendarList = calendarRepository.getLocalCalendarList()
+        setCalendarList(calendarList)
+    }
 
     //  Google Calendar에서 요구하는 RFC3339형식으로 변경
     private fun formatDate(date: Date): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'")
         return dateFormat.format(date)
+    }
+
+    private fun setCalendarList(list: List<CalendarEntity>) {
+        for(calendar in list){
+            Log.e("setCalendarList", "${calendar.id}${calendar.summary}")
+        }
+        _calendarListLiveData.postValue(list)
+    }
+
+    fun setSelectCalendar(position: Int) {
+        val selectCalendar = calendarListLiveData.value?.get(position)
+        _selectCalendarLiveData.postValue(selectCalendar!!)
     }
 
     fun setStartDate(cal: Calendar) {
@@ -69,7 +95,7 @@ class AddEventViewModel: ViewModel() {
     fun setUser(userList: List<String>) {
         _userLiveData.postValue(userList)
     }
-    fun setReminder(reminderList: List<InsertCalendarData>) {
+    fun setReminder(reminderList: List<InsertReminderData>) {
         _reminderLiveData.postValue(reminderList)
     }
 }

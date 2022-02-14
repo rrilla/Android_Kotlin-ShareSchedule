@@ -7,9 +7,9 @@ import com.example.share_schedule.databinding.ItemInsertcalendarBinding
 
 class ReminderAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-    var data: MutableList<InsertCalendarData> = mutableListOf()
+    var data: MutableList<InsertReminderData> = mutableListOf()
 
-    fun addItem(data: InsertCalendarData) {
+    fun addItem(data: InsertReminderData) {
         this.data.add(data)
         notifyDataSetChanged()
     }

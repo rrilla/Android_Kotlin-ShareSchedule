@@ -1,7 +1,6 @@
 package com.example.share_schedule.insertCalendar.adapter
 
-data class InsertCalendarData (
-    val email: String = "",
+data class InsertReminderData (
     val time: Int = 10,
     val timeType: String = "",
     val reminderType: String = ""

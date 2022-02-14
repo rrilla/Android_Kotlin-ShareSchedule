@@ -61,7 +61,7 @@ class CalendarViewModel: BaseViewModel() {
         }
     }
 
-    suspend fun getLocalCalendarList(): List<CalendarEntity> {
+    private suspend fun getLocalCalendarList(): List<CalendarEntity> {
         return calendarRepository.getLocalCalendarList()
     }
 

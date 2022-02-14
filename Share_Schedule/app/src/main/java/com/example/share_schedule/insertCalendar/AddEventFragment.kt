@@ -2,21 +2,18 @@ package com.example.share_schedule.insertCalendar
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.share_schedule.R
 import com.example.share_schedule.databinding.FragmentAddEventBinding
-import com.example.share_schedule.insertCalendar.adapter.InsertCalendarData
 import com.example.share_schedule.insertCalendar.adapter.ReminderAdapter
 import com.example.share_schedule.insertCalendar.adapter.UserAdapter
 import com.example.share_schedule.insertCalendar.util.InsertCalendarDialog
@@ -28,10 +25,10 @@ class AddEventFragment : Fragment() {
     private val viewModel: AddEventViewModel by viewModels()
     private val shareViewModel: ShareViewModel by activityViewModels()
 
-    val userAdapter: UserAdapter by lazy {
+    private val userAdapter: UserAdapter by lazy {
         UserAdapter()
     }
-    val reminderAdapter: ReminderAdapter by lazy {
+    private val reminderAdapter: ReminderAdapter by lazy {
         ReminderAdapter()
     }
 
@@ -46,6 +43,7 @@ class AddEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.getCalendarList()
         initViews()
         observeData()
     }
@@ -82,21 +80,19 @@ class AddEventFragment : Fragment() {
 
         binding.addAttendees.setOnClickListener {
             //  custom dialog
-            InsertCalendarDialog(InsertCalendarDialog.MyDialogTag.USER,
-                object: InsertCalendarDialog.InsertCalendarDialogListener{
-                    override fun onDialogPositiveClick(dialog: DialogFragment, data: InsertCalendarData) {
-                        userAdapter.addItem(data.email)
-                    }
-                }).show(parentFragmentManager, "dialogUser")
+            InsertCalendarDialog(InsertCalendarDialog.MyDialogTag.USER).apply {
+                setUserOnClickListener {
+                    dialogFragment, email -> userAdapter.addItem(email)
+                }
+            }.show(parentFragmentManager, "dialogUser")
         }
 
         binding.addReminder.setOnClickListener {
-            InsertCalendarDialog(InsertCalendarDialog.MyDialogTag.REMINDER,
-                object: InsertCalendarDialog.InsertCalendarDialogListener{
-                    override fun onDialogPositiveClick(dialog: DialogFragment, data: InsertCalendarData) {
-                        reminderAdapter.addItem(data)
-                    }
-                }).show(parentFragmentManager, "dialogReminder")
+            InsertCalendarDialog(InsertCalendarDialog.MyDialogTag.REMINDER).apply {
+                setReminderOnClickListener {
+                    dialogFragment, data -> reminderAdapter.addItem(data)
+                }
+            }.show(parentFragmentManager, "dialogReminder")
         }
 
         binding.saveButton.setOnClickListener {
@@ -164,6 +160,27 @@ class AddEventFragment : Fragment() {
     }
 
     private fun observeData() {
+        viewModel.calendarListLiveData.observe(this){
+            binding.addCalendarTextView.text = it[0].summary
+            //  ListAdapter로 캘린더 목록에 따라 동적 바인딩
+            val listArr = arrayListOf<String>()
+            for (item in it){
+                listArr.add(item?.summary ?: "제목없는 캘린더" )
+            }
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listArr)
+
+            binding.addCalendarTextView.setOnClickListener {
+                InsertCalendarDialog(InsertCalendarDialog.MyDialogTag.CALENDAR).apply {
+                    setCalendarOnClickListener{ dialogFragment, position ->
+                        viewModel.setSelectCalendar(position)
+                    }
+                    setAdapter(adapter)
+                }.show(parentFragmentManager, "dialogCalendar")
+            }
+        }
+        viewModel.selectCalendarLiveData.observe(this){
+            binding.addCalendarTextView.text = it.summary
+        }
         viewModel.startDateLiveData.observe(this){
             binding.startDate.text = "${it.get(Calendar.YEAR)}년 ${it.get(Calendar.MONTH)+1}월 ${it.get(Calendar.DATE)}일"
         }
@@ -177,7 +194,6 @@ class AddEventFragment : Fragment() {
             binding.endTime.text = "${it.get(Calendar.HOUR_OF_DAY)} 시 ${it.get(Calendar.MINUTE)}분"
         }
 
-
         shareViewModel.selectLocationLiveData.observe(this){
             if(it["title"] == null || it["address"] == null){
                 binding.addLocation.text = getString(R.string.error_location)
@@ -187,6 +203,4 @@ class AddEventFragment : Fragment() {
             }
         }
     }
-
-
 }
