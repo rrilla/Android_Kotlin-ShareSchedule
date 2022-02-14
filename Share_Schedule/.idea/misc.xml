@@ -9,9 +9,12 @@
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/activity_insert_calendar.xml" value="0.36614583333333334" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/activity_login.xml" value="0.19010416666666666" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/calendar_toolbar.xml" value="0.17119565217391305" />
+        <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/dialog_insert.xml" value="0.37864583333333335" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/fragment_add_event.xml" value="0.3515625" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/fragment_calendar.xml" value="0.17119565217391305" />
+        <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/fragment_map.xml" value="0.36614583333333334" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/fragment_month.xml" value="0.17119565217391305" />
+        <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/item_insertcalendar.xml" value="0.37864583333333335" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/item_monthview.xml" value="0.17806484295845998" />
         <entry key="..\:/git/Android_Kotlin-ShareSchedule/Share_Schedule/app/src/main/res/layout/navi_header.xml" value="0.17806484295845998" />
       </map>
