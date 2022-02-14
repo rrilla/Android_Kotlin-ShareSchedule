@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search_rankBy">
+        <item>구글추천순</item>
+        <item>거리순</item>
+    </string-array>
+    <string-array name="search_type">
+        <item>식당</item>
+        <item>카페</item>
+    </string-array>
+</resources>
