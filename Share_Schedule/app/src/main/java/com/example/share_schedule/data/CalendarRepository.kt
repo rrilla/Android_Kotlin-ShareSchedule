@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.HashMap
 
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.model.*
 import java.lang.Exception
 

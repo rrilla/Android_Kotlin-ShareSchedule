@@ -67,6 +67,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.1.0'
     implementation 'com.google.api-client:google-api-client-android:1.33.0'
     implementation 'com.google.apis:google-api-services-calendar:v3-rev20211026-1.32.1'
+    // Google Places - 자동완성주소
+    implementation 'com.google.android.libraries.places:places:2.5.0'
+    // Google Map 띄우기, 현재장소 찾기
+    implementation 'com.google.android.gms:play-services-maps:18.0.1'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
 
     //  firebase
     implementation platform('com.google.firebase:firebase-bom:29.0.4')
