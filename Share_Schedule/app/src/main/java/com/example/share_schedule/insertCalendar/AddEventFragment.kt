@@ -3,6 +3,7 @@ package com.example.share_schedule.insertCalendar
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,7 +15,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.share_schedule.MyApplication
 import com.example.share_schedule.R
+import com.example.share_schedule.calendar.CalendarActivity
 import com.example.share_schedule.data.remote.model.event.Event
 import com.example.share_schedule.data.remote.model.event.InsertEventEntity
 import com.example.share_schedule.databinding.FragmentAddEventBinding
@@ -25,10 +28,7 @@ import com.example.share_schedule.signin.ProfileState
 import com.kakao.sdk.common.util.KakaoCustomTabsClient
 import com.kakao.sdk.link.LinkClient
 import com.kakao.sdk.link.WebSharerClient
-import com.kakao.sdk.template.model.Content
-import com.kakao.sdk.template.model.Link
-import com.kakao.sdk.template.model.LocationTemplate
-import com.kakao.sdk.template.model.Social
+import com.kakao.sdk.template.model.*
 import java.util.*
 
 class AddEventFragment : Fragment() {
@@ -240,25 +240,34 @@ class AddEventFragment : Fragment() {
             setMessage(R.string.confirmShareSchedule)
             setPositiveButton("확인") { _, _ ->
                 sendKakaoLink()
+                passToCalendarActivity()
             }
             setNegativeButton("취소") { _, _ ->
-                requireActivity().finish()
+                passToCalendarActivity()
             }
         }.show()
     }
 
     private fun handleErrorState() { }
 
+    private fun passToCalendarActivity() {
+        with(requireActivity()){
+            intent = Intent(context, CalendarActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                putExtra(getString(R.string.autoLogin), false)
+            }
+            startActivity(intent)
+            finish()
+        }
+    }
+
     private fun sendKakaoLink() {
-        val defaultLocation = LocationTemplate(
-            address = "경기 성남시 분당구 판교역로 235 에이치스퀘어 N동 8층",
-            addressTitle = "카카오 판교오피스 카페톡",
+        val defaultFeed = FeedTemplate(
             content = Content(
-                title = "신메뉴 출시❤️ 체리블라썸라떼",
-                description = "이번 주는 체리블라썸라떼 1+1",
-                imageUrl = "http://mud-kage.kakao.co.kr/dn/bSbH9w/btqgegaEDfW/vD9KKV0hEintg6bZT4v4WK/kakaolink40_original.png",
+                title = "'${MyApplication.firebaseAuth.currentUser?.displayName}'님이 일정을 공유 하셨습니다.",
+                imageUrl = "https://post-phinf.pstatic.net/MjAyMDA2MDRfMjcz/MDAxNTkxMjMyNDIwODAy.Zb1gf9wnPBXyh2iwqt6WbG9NVlwKAbA0aZb3VCtLS28g.PZ22F-FY0uq_7snQ3i_VNcmBLDWkZA4Vv1wE_MsxBBcg.JPEG/fsdfsdf.JPG.jpg",
                 link = Link(
-                    webUrl = "https://developers.com",
+                    webUrl = "https://developers.kakao.com",
                     mobileWebUrl = "https://developers.kakao.com"
                 )
             )
@@ -268,7 +277,7 @@ class AddEventFragment : Fragment() {
         if (LinkClient.instance.isKakaoLinkAvailable(requireContext())) {
             val TAG = "AddEventFragment"
             // 카카오톡으로 카카오링크 공유 가능
-            LinkClient.instance.defaultTemplate(requireContext(), defaultLocation) { linkResult, error ->
+            LinkClient.instance.defaultTemplate(requireContext(), defaultFeed) { linkResult, error ->
                 if (error != null) {
                     Log.e(TAG, "카카오링크 보내기 실패", error)
                 }
@@ -283,7 +292,7 @@ class AddEventFragment : Fragment() {
             }
         } else {
             // 카카오톡 미설치: 웹 공유 사용 권장
-            val sharerUrl = WebSharerClient.instance.defaultTemplateUri(defaultLocation)
+            val sharerUrl = WebSharerClient.instance.defaultTemplateUri(defaultFeed)
 
             // 1. CustomTabs으로 Chrome 브라우저 열기
             try {
