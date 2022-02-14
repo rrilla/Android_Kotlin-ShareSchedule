@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.kakao.sdk.common.KakaoSdk
 
 class MyApplication: Application() {
 
@@ -49,5 +50,7 @@ class MyApplication: Application() {
             CalendarDatabase::class.java,
             CalendarDatabase.DB_NAME
         ).build()
+
+        KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
     }
 }
