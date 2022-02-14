@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jh_calendar.signin.ProfileState
 import com.example.share_schedule.MyApplication
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ class LoginViewModel: ViewModel() {
         }
     }
 
-    private fun setState(state: ProfileState) {
+    fun setState(state: ProfileState) {
         _profileStateLiveData.postValue(state)
     }
 

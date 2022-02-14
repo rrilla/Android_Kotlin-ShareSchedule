@@ -8,22 +8,20 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.example.jh_calendar.signin.ProfileState
 import com.example.share_schedule.MyApplication
+import com.example.share_schedule.MyApplication.Companion.firebaseAuth
 import com.example.share_schedule.R
 import com.example.share_schedule.calendar.CalendarActivity
+import com.example.share_schedule.data.CalendarRepository
 import com.example.share_schedule.data.remote.GoogleCalendarApiProvider
 import com.example.share_schedule.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.calendar.CalendarScopes
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import java.lang.Exception
@@ -32,11 +30,6 @@ class LoginActivity : AppCompatActivity() {
 
     private val viewModel: LoginViewModel by viewModels()
     lateinit var binding: ActivityLoginBinding
-    private fun getViewBinding(): ActivityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
-
-    private val firebaseAuth by lazy {
-        FirebaseAuth.getInstance()
-    }
 
     private val loginLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -46,13 +39,14 @@ class LoginActivity : AppCompatActivity() {
             } ?: throw Exception()
         } catch (e: ApiException) {
             Log.w("LoginActivity", "signInResult:failed code=" + e.statusCode);
+            viewModel.setState(ProfileState.Error)
             e.printStackTrace()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = getViewBinding()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         checkLastLogin()
@@ -61,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun checkLastLogin() {
-        if(firebaseAuth.currentUser != null) {
+        firebaseAuth.currentUser?.let {
             createGoogleCredential(firebaseAuth.currentUser)
             passToCalendarActivity(autoLogin = true)
         }
@@ -74,7 +68,7 @@ class LoginActivity : AppCompatActivity() {
         ).setBackOff(ExponentialBackOff())
         // setbackoff - I/O 예외가 #getToken 내부 또는 없음으로 throw될 때 사용되는 역오프 정책을 반환.
 
-        googleCredential.selectedAccount = Account(user?.email,packageName)
+        googleCredential.selectedAccount = Account(user?.email, packageName)
         createService(googleCredential)
     }
 
@@ -83,6 +77,15 @@ class LoginActivity : AppCompatActivity() {
         val jsonFactory = GsonFactory.getDefaultInstance()
 
         GoogleCalendarApiProvider.createService(transport, jsonFactory, credential)
+    }
+
+    private fun passToCalendarActivity(autoLogin: Boolean) {
+        intent = Intent(this@LoginActivity, CalendarActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            putExtra(getString(R.string.autoLogin), autoLogin)
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun observeData() = viewModel.profileStateLiveData.observe(this) {
@@ -121,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
                     viewModel.setUserInfo(user)
                 } else {
                     viewModel.setUserInfo(null)
-                    Toast.makeText(this@LoginActivity, "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -132,6 +134,7 @@ class LoginActivity : AppCompatActivity() {
                 handleRegisteredState(state)
             }
             is ProfileState.Success.NotRegistered -> {
+                handleNotRegisteredState(state)
             }
         }
     }
@@ -140,16 +143,11 @@ class LoginActivity : AppCompatActivity() {
         passToCalendarActivity(autoLogin = false)
     }
 
-    private fun passToCalendarActivity(autoLogin: Boolean) {
-        intent = Intent(this@LoginActivity, CalendarActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            putExtra(getString(R.string.autoLogin), autoLogin)
-        }
-        startActivity(intent)
-        finish()
+    private fun handleNotRegisteredState(state: ProfileState.Success.NotRegistered) {
+        Toast.makeText(this@LoginActivity, R.string.signIn_fail_firebase, Toast.LENGTH_SHORT).show()
     }
 
     private fun handleErrorState() {
-        Toast.makeText(this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.signIn_fail_google, Toast.LENGTH_SHORT).show()
     }
 }
