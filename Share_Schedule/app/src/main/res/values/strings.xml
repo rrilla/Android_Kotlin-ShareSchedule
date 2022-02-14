@@ -27,6 +27,9 @@
 
 
     <string name="confirmInsertCalendar">이 일정을 삭제하시겠습니까?</string>
+    <string name="confirmShareSchedule">등록이 완료 되었습니다. \n 카카오톡으로 친구에게 일정을 공유 하시겠습니까?</string>
+
+
 
 
 </resources>

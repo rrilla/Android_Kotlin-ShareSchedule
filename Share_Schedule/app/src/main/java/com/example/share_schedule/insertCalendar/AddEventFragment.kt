@@ -2,6 +2,8 @@ package com.example.share_schedule.insertCalendar
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,7 +15,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.share_schedule.MyApplication
 import com.example.share_schedule.R
+import com.example.share_schedule.calendar.CalendarActivity
 import com.example.share_schedule.data.remote.model.event.Event
 import com.example.share_schedule.data.remote.model.event.InsertEventEntity
 import com.example.share_schedule.databinding.FragmentAddEventBinding
@@ -21,6 +25,10 @@ import com.example.share_schedule.insertCalendar.adapter.ReminderAdapter
 import com.example.share_schedule.insertCalendar.adapter.UserAdapter
 import com.example.share_schedule.insertCalendar.util.InsertCalendarDialog
 import com.example.share_schedule.signin.ProfileState
+import com.kakao.sdk.common.util.KakaoCustomTabsClient
+import com.kakao.sdk.link.LinkClient
+import com.kakao.sdk.link.WebSharerClient
+import com.kakao.sdk.template.model.*
 import java.util.*
 
 class AddEventFragment : Fragment() {
@@ -228,8 +236,76 @@ class AddEventFragment : Fragment() {
     private fun handleLoadingState() { }
 
     private fun handleSuccessState() {
-        
+        AlertDialog.Builder(requireContext()).apply {
+            setMessage(R.string.confirmShareSchedule)
+            setPositiveButton("확인") { _, _ ->
+                sendKakaoLink()
+                passToCalendarActivity()
+            }
+            setNegativeButton("취소") { _, _ ->
+                passToCalendarActivity()
+            }
+        }.show()
     }
 
     private fun handleErrorState() { }
+
+    private fun passToCalendarActivity() {
+        with(requireActivity()){
+            intent = Intent(context, CalendarActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                putExtra(getString(R.string.autoLogin), false)
+            }
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun sendKakaoLink() {
+        val defaultFeed = FeedTemplate(
+            content = Content(
+                title = "'${MyApplication.firebaseAuth.currentUser?.displayName}'님이 일정을 공유 하셨습니다.",
+                imageUrl = "https://post-phinf.pstatic.net/MjAyMDA2MDRfMjcz/MDAxNTkxMjMyNDIwODAy.Zb1gf9wnPBXyh2iwqt6WbG9NVlwKAbA0aZb3VCtLS28g.PZ22F-FY0uq_7snQ3i_VNcmBLDWkZA4Vv1wE_MsxBBcg.JPEG/fsdfsdf.JPG.jpg",
+                link = Link(
+                    webUrl = "https://developers.kakao.com",
+                    mobileWebUrl = "https://developers.kakao.com"
+                )
+            )
+        )
+
+        // 카카오톡 설치여부 확인
+        if (LinkClient.instance.isKakaoLinkAvailable(requireContext())) {
+            val TAG = "AddEventFragment"
+            // 카카오톡으로 카카오링크 공유 가능
+            LinkClient.instance.defaultTemplate(requireContext(), defaultFeed) { linkResult, error ->
+                if (error != null) {
+                    Log.e(TAG, "카카오링크 보내기 실패", error)
+                }
+                else if (linkResult != null) {
+                    Log.d(TAG, "카카오링크 보내기 성공 ${linkResult.intent}")
+                    startActivity(linkResult.intent)
+
+                    // 카카오링크 보내기에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
+                    Log.w(TAG, "Warning Msg: ${linkResult.warningMsg}")
+                    Log.w(TAG, "Argument Msg: ${linkResult.argumentMsg}")
+                }
+            }
+        } else {
+            // 카카오톡 미설치: 웹 공유 사용 권장
+            val sharerUrl = WebSharerClient.instance.defaultTemplateUri(defaultFeed)
+
+            // 1. CustomTabs으로 Chrome 브라우저 열기
+            try {
+                KakaoCustomTabsClient.openWithDefault(requireContext(), sharerUrl)
+            } catch(e: UnsupportedOperationException) {
+                // Chrome 브라우저가 없을 때 예외처리
+            }
+            // 2. CustomTabs으로 디바이스 기본 브라우저 열기
+            try {
+                KakaoCustomTabsClient.open(requireContext(), sharerUrl)
+            } catch (e: ActivityNotFoundException) {
+                // 인터넷 브라우저가 없을 때 예외처리
+            }
+        }
+    }
 }

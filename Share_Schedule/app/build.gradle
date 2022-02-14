@@ -25,6 +25,8 @@ android {
         buildConfigField "String", "GOOGLE_API_KEY1", properties['GOOGLE_API_KEY1']
         buildConfigField "String", "GOOGLE_API_KEY2", properties['GOOGLE_API_KEY2']
         buildConfigField "String", "DEFAULT_WEB_CLIENT_ID", properties['DEFAULT_WEB_CLIENT_ID']
+        buildConfigField "String", "KAKAO_NATIVE_APP_KEY", properties['KAKAO_NATIVE_APP_KEY']
+
 
         // 메니페스트
 //        manifestPlaceholders = [GOOGLE_API_KEY1: "GOOGLE_API_KEY1"]
@@ -96,4 +98,6 @@ dependencies {
     // Retrofit2
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation "com.kakao.sdk:v2-link:2.8.5" // 카카오 메시지(카카오링크)
 }
