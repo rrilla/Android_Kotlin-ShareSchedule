@@ -22,6 +22,7 @@ import androidx.core.view.isVisible
 import com.example.share_schedule.R
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.example.share_schedule.BuildConfig
 import com.example.share_schedule.base.BaseMapFragment
 import com.example.share_schedule.databinding.FragmentMapBinding
 import com.example.share_schedule.insertCalendar.util.showSnackbar
@@ -109,7 +110,7 @@ class MapFragment: BaseMapFragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        Places.initialize(context, getString(R.string.google_api_key));
+        Places.initialize(context, BuildConfig.PLACE_API_KEY)
         binding = FragmentMapBinding.inflate(layoutInflater)
         mapView = binding.map
         mapView.onCreate(savedInstanceState)

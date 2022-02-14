@@ -6,6 +6,9 @@ plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdk 31
 
@@ -17,6 +20,14 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // 프로젝트
+        buildConfigField "String", "GOOGLE_API_KEY", properties['GOOGLE_API_KEY']
+        buildConfigField "String", "PLACE_API_KEY", properties['PLACE_API_KEY']
+        buildConfigField "String", "DEFAULT_WEB_CLIENT_ID", properties['DEFAULT_WEB_CLIENT_ID']
+
+        // 메니페스트
+        manifestPlaceholders = [GOOGLE_API_KEY: "GOOGLE_API_KEY"]
     }
 
     buildTypes {
