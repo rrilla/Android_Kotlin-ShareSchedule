@@ -136,7 +136,6 @@ class MapFragment: BaseMapFragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        getLocationPermission()
         binding.autoButton.setOnClickListener {
             binding.alertLayout.isVisible = false
             //  반환할 데이터 유형
