@@ -3,6 +3,7 @@ package com.example.share_schedule.insertCalendar
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -126,8 +127,9 @@ class AddEventFragment : Fragment() {
     }
 
     private fun selectDate(type: String) {
-        val cal = Calendar.getInstance()
+
         if(type == "start"){
+            val cal = viewModel.startDateTimeLiveData.value!!
             val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 cal.set(year, month, dayOfMonth)
                 viewModel.setStartDateTime(cal)
@@ -136,6 +138,7 @@ class AddEventFragment : Fragment() {
                 Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
                 .show()
         } else{
+            val cal = viewModel.endDateTimeLiveData.value!!
             val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 cal.set(year, month, dayOfMonth)
                 viewModel.setEndDateTime(cal)
@@ -147,18 +150,24 @@ class AddEventFragment : Fragment() {
     }
 
     private fun selectTime(type: String) {
-        val cal = Calendar.getInstance()
         if(type == "start"){
+            val cal = viewModel.startDateTimeLiveData.value!!
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 binding.startTime.text = "${hour} 시 ${minute}분"
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
+                Log.e("selectTime", """
+                    displayname - ${cal.timeZone.displayName}
+                    id - ${cal.timeZone.id}
+                    string - ${cal.timeZone.toString()}""".trimIndent())
+                cal.time
                 viewModel.setStartDateTime(cal)
             }
             TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR),
                 cal.get(Calendar.MINUTE), true)
                 .show()
         } else{
+            val cal = viewModel.endDateTimeLiveData.value!!
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 binding.endTime.text = "${hour} 시 ${minute}분"
                 cal.set(Calendar.HOUR_OF_DAY, hour)

@@ -126,10 +126,12 @@ class CalendarRepository: CalendarDataSource {
 
             val start = EventDateTime()
                 .setDateTime(insertEvent.startDateTime)
+                .setTimeZone("Asia/Seoul")
             event.start = start
 
             val end = EventDateTime()
                 .setDateTime(insertEvent.endDateTime)
+                .setTimeZone("Asia/Seoul")
             event.end = end
 
             insertEvent.attendees?.let {

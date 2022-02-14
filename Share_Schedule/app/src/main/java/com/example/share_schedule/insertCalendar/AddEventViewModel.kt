@@ -36,12 +36,6 @@ class AddEventViewModel: ViewModel() {
         setCalendarList(calendarList)
     }
 
-    //  Google Calendar에서 요구하는 RFC3339형식으로 변경
-    private fun formatDate(date: Date): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'")
-        return dateFormat.format(date)
-    }
-
     private fun setCalendarList(list: List<CalendarEntity>) {
         _calendarListLiveData.postValue(list)
     }
@@ -52,17 +46,15 @@ class AddEventViewModel: ViewModel() {
     }
 
     fun setStartDateTime(cal: Calendar) {
-        Log.e("setStartDate", formatDate(cal.time))
         _startDateTimeLiveData.postValue(cal)
     }
     fun setEndDateTime(cal: Calendar) {
-        Log.e("setEndDate", "time - ${cal.time}")
         _endDateTimeLiveData.postValue(cal)
     }
 
     fun insertEvent(event: InsertEventEntity) = viewModelScope.launch {
-        val startDateTime = startDateTimeLiveData.value?.let { formatDate(it.time) }
-        val endDateTime = endDateTimeLiveData.value?.let { formatDate(it.time) }
+        val startDateTime = startDateTimeLiveData.value?.time
+        val endDateTime = endDateTimeLiveData.value?.time
         event.apply {
             this.calendarId = selectCalendarLiveData.value?.id
             this.startDateTime = DateTime(startDateTime)
@@ -72,7 +64,4 @@ class AddEventViewModel: ViewModel() {
         calendarRepository.insertEvent(event)
     }
 
-//    private fun getStartDateTime() {
-//        startDateLiveData.value.set(Calendar.HOUR_OF_DAY)
-//    }
 }
