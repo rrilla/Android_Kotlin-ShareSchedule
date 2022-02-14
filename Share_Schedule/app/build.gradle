@@ -22,12 +22,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // 프로젝트
-        buildConfigField "String", "GOOGLE_API_KEY", properties['GOOGLE_API_KEY']
-        buildConfigField "String", "PLACE_API_KEY", properties['PLACE_API_KEY']
+        buildConfigField "String", "GOOGLE_API_KEY1", properties['GOOGLE_API_KEY1']
+        buildConfigField "String", "GOOGLE_API_KEY2", properties['GOOGLE_API_KEY2']
         buildConfigField "String", "DEFAULT_WEB_CLIENT_ID", properties['DEFAULT_WEB_CLIENT_ID']
 
         // 메니페스트
-        manifestPlaceholders = [GOOGLE_API_KEY: "GOOGLE_API_KEY"]
+//        manifestPlaceholders = [GOOGLE_API_KEY1: "GOOGLE_API_KEY1"]
     }
 
     buildTypes {

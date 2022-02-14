@@ -103,9 +103,6 @@ class AddEventFragment : Fragment() {
         binding.saveButton.setOnClickListener {
             val summary = binding.addSummary.text.toString()
             val description = binding.addDescription.text.toString()
-//            viewModel.setUser(userAdapter.data)
-//            viewModel.setReminder(reminderAdapter.data)
-//            shareViewModel.selectLocationLiveData
             val event = InsertEventEntity().apply {
                 this.summary = summary
                 this.description = description

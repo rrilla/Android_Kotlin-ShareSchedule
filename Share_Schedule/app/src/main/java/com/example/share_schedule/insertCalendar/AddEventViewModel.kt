@@ -59,7 +59,6 @@ class AddEventViewModel: ViewModel() {
             this.calendarId = selectCalendarLiveData.value?.id
             this.startDateTime = DateTime(startDateTime)
             this.endDateTime = DateTime(endDateTime)
-            this.location = "테스트위치"
         }
         calendarRepository.insertEvent(event)
     }

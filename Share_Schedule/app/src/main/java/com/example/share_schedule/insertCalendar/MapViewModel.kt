@@ -1,6 +1,5 @@
 package com.example.share_schedule.insertCalendar
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,32 +20,30 @@ class MapViewModel: ViewModel() {
 
     fun searchByProminence(location: LatLng, type: String) = viewModelScope.launch {
         GooglePlaceApiProvider.googlePlaceApiService.searchByProminence(
-            BuildConfig.GOOGLE_API_KEY,
+            BuildConfig.GOOGLE_API_KEY2,
             "${location.latitude}, ${location.longitude}",
             type)
             .enqueue(object: Callback<ResponseModel> {
                 override fun onResponse(call: Call<ResponseModel>, response: Response<ResponseModel>) {
-                    Log.e("MapViewModel","onResponse - ${response.body()?.results.toString()}")
                     setPlace(response.body()?.results!!)
                 }
                 override fun onFailure(call: Call<ResponseModel>, t: Throwable) {
-                    Log.e("MapViewModel","onFailure - ${t.printStackTrace()}")
+                    t.printStackTrace()
                 }
             })
     }
 
     fun searchByDistance(location: LatLng, type: String) = viewModelScope.launch {
         GooglePlaceApiProvider.googlePlaceApiService.searchByDistance(
-            BuildConfig.GOOGLE_API_KEY,
+            BuildConfig.GOOGLE_API_KEY2,
             "${location.latitude}, ${location.longitude}",
             type)
             .enqueue(object: Callback<ResponseModel> {
                 override fun onResponse(call: Call<ResponseModel>, response: Response<ResponseModel>) {
-                    Log.e("MapViewModel","onResponse - ${response.body()?.results.toString()}")
                     setPlace(response.body()?.results!!)
                 }
                 override fun onFailure(call: Call<ResponseModel>, t: Throwable) {
-                    Log.e("MapViewModel","onFailure - ${t.printStackTrace()}")
+                    t.printStackTrace()
                 }
             })
     }

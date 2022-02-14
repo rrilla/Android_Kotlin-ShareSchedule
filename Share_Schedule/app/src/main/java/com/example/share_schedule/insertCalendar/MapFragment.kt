@@ -110,7 +110,7 @@ class MapFragment: BaseMapFragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        Places.initialize(context, BuildConfig.PLACE_API_KEY)
+        Places.initialize(context, BuildConfig.GOOGLE_API_KEY2)
         binding = FragmentMapBinding.inflate(layoutInflater)
         mapView = binding.map
         mapView.onCreate(savedInstanceState)
@@ -145,11 +145,11 @@ class MapFragment: BaseMapFragment(), OnMapReadyCallback {
             autoCompleteLaunch.launch(intent)
         }
 
-        initView()
+        initViews()
         observe()
     }
 
-    private fun initView() {
+    private fun initViews() {
         initSpinner()
         binding.switchAutoSearch.setOnCheckedChangeListener { _, isChecked ->
             searchAuto = isChecked
@@ -226,7 +226,29 @@ class MapFragment: BaseMapFragment(), OnMapReadyCallback {
         viewModel.placeLiveData.observe(this){
             //마커표시
             if(searchAuto){
+                for (place in it) {
+                    val location = LatLng(place.geometry.location.lat, place.geometry.location.lng)
+                    map.addMarker(
+                        MarkerOptions().position(location).title(place.name).snippet(place.vicinity)
+                    )
+                }
             } else {
+                for ((index, place) in it.withIndex()) {
+                    val location = LatLng(place.geometry.location.lat, place.geometry.location.lng)
+                    when (index) {
+                        0 -> map.addMarker(
+                            MarkerOptions().position(location).title(place.name).snippet(place.vicinity).icon(
+                                BitmapDescriptorFactory.fromResource(R.drawable.icon_ranking1)).zIndex(3f))
+                        1 -> map.addMarker(
+                            MarkerOptions().position(location).title(place.name).snippet(place.vicinity).icon(
+                                BitmapDescriptorFactory.fromResource(R.drawable.icon_ranking2)).zIndex(2f))
+                        2 -> map.addMarker(
+                            MarkerOptions().position(location).title(place.name).snippet(place.vicinity).icon(
+                                BitmapDescriptorFactory.fromResource(R.drawable.icon_ranking3)).zIndex(1f))
+                        else -> map.addMarker(
+                            MarkerOptions().position(location).title(place.name).snippet(place.vicinity))
+                    }
+                }
             }
         }
     }
